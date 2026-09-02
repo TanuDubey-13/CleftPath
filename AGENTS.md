@@ -10,11 +10,36 @@
 
 CleftPath is a privacy-first, full-stack, AI-assisted healthcare technology platform supporting individuals and families across the longitudinal cleft lip and palate journey.
 
-### 1.1 Development Tool Separation
-* **Cursor:** Primary IDE for **Frontend Engineering** (`frontend/` directory).
-  * React 18, TypeScript, Vite, Tailwind CSS, TanStack Query, Recharts, React Hook Form, Zod.
-* **Antigravity:** Primary IDE for **Backend Engineering & AI Pipelines** (`backend/` directory).
-  * Python 3.11+, FastAPI, SQLAlchemy 2.0 Async, Alembic, PostgreSQL 16 + pgvector, Google Gemini API, Pytest.
+### 1.1 Development Agent
+
+**Antigravity is the primary development agent for the entire CleftPath repository.**
+
+Antigravity is responsible for:
+
+- Frontend Engineering (`frontend/`)
+  - React, TypeScript, Vite, Tailwind CSS, TanStack Query, Recharts, React Hook Form, Zod.
+
+- Backend Engineering (`backend/`)
+  - Python 3.11+, FastAPI, SQLAlchemy 2.0 Async, Alembic, PostgreSQL 16 + pgvector.
+
+- AI/ML Engineering (`ai-service/`)
+  - Google Gemini API, RAG pipelines, embeddings, AI safety and evaluation.
+
+- Knowledge Base (`knowledge-base/`)
+  - Health content, source verification, retrieval and grounding.
+
+- Testing
+  - Pytest, Vitest, React Testing Library, Playwright.
+
+- Infrastructure & Deployment
+  - Docker, Docker Compose, CI/CD, cloud deployment and environment configuration.
+
+- Documentation
+  - Architecture, API, database, security, AI, testing and deployment documentation.
+
+All implementation, debugging, testing, verification, and documentation work should be performed through Antigravity unless a specific external tool is explicitly required.
+
+Antigravity must follow all architecture, security, privacy, medical-safety, and design-system rules defined in this document and the `docs/` directory.
 
 ---
 
@@ -70,4 +95,4 @@ Before marking any module or pull request complete:
 3. SQLAlchemy model mapped with Alembic migration generated.
 4. Tenant isolation authorization test implemented in `tests/`.
 5. TypeScript interfaces and React Hook Form components wired with TanStack Query.
-6. Linting, type-checking, and unit tests passing ($100\%$ pass rate).
+6. Linting, type-checking, and unit tests passing (100\% pass rate).
