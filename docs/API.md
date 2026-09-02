@@ -312,15 +312,63 @@ Alternatively, browser clients authenticate via an `HttpOnly`, `SameSite=Strict`
 
 ### 2.10 The Village (`/api/v1/village`)
 
+> **Community Peer Support Notice:** The Village is an educational and peer-support environment. Community posts and comments reflect lived personal experiences and are never a substitute for clinical advice. All mutations enforce strict IDOR server-side ownership. Moderation endpoints are restricted to `ADMIN` and `CLINICIAN` roles. Zero AI diagnosis or RAG functionality is attached.
+
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/village/channels` | List stage-based community channels | Yes |
-| `GET` | `/village/posts` | Paginated feed of posts filtered by channel/tag | Yes |
-| `POST` | `/village/posts` | Create new post (subject to automated PII & safety scan) | Yes |
-| `GET` | `/village/posts/{id}` | Get post details and threaded comments | Yes |
-| `POST` | `/village/posts/{id}/comments` | Add comment to a community post | Yes |
-| `POST` | `/village/posts/{id}/react` | Toggle supportive reaction (Heart, Hug, Fist Bump) | Yes |
-| `POST` | `/village/reports` | Flag a post or comment for moderator review | Yes |
+| `GET` | `/village/channels` | List community channels with post counts | Yes |
+| `GET` | `/village/channels/{channel_id}` | Get single channel details | Yes |
+| `GET` | `/village/channels/{channel_id}/posts` | List posts within a specific channel | Yes |
+| `GET` | `/village/posts` | List community posts across channels with search filter | Yes |
+| `GET` | `/village/posts/{post_id}` | Get post details and user reaction state | Yes |
+| `POST` | `/village/posts` | Create a new community post | Yes |
+| `PATCH` | `/village/posts/{post_id}` | Edit own community post | Yes |
+| `DELETE` | `/village/posts/{post_id}` | Delete own community post | Yes |
+| `GET` | `/village/posts/{post_id}/comments` | List comments for a post | Yes |
+| `POST` | `/village/posts/{post_id}/comments` | Add a comment to a post | Yes |
+| `PATCH` | `/village/comments/{comment_id}` | Edit own comment | Yes |
+| `DELETE` | `/village/comments/{comment_id}` | Delete own comment | Yes |
+| `POST` | `/village/posts/{post_id}/reactions` | Toggle supportive reaction (`heart`, `hug`, `celebrate`, `strength`, `helpful`) | Yes |
+| `POST` | `/village/posts/{post_id}/report` | Report inappropriate post content | Yes |
+| `POST` | `/village/comments/{comment_id}/report` | Report inappropriate comment content | Yes |
+| `GET` | `/village/moderation/reports` | Moderation queue: list reports (Admin/Clinician) | Yes (Admin/Clinician) |
+| `POST` | `/village/moderation/reports/{report_id}/resolve` | Resolve moderation report / hide content (Admin/Clinician) | Yes (Admin/Clinician) |
+
+#### `POST /api/v1/village/posts`
+**Request Body:**
+```json
+{
+  "channel_id": "8a32d184-7e9c-4b53-a5a4-969c3a30f301",
+  "title": "Tips for keeping soft arm restraints comfortable during sleep?",
+  "content": "We are getting ready for Leo's lip repair in 4 weeks. Any advice from parents who have gone through this on making sleep more comfortable?",
+  "author_alias": "Parent Sarah"
+}
+```
+
+**Response Body:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "e67d2b45-12fa-48b2-8fa0-90c1284d7801",
+    "channel_id": "8a32d184-7e9c-4b53-a5a4-969c3a30f301",
+    "channel_name": "Surgery Prep & Recovery",
+    "channel_slug": "surgery-prep",
+    "user_id": "3c84f67e-12fa-48b2-8fa0-90c1284d7800",
+    "author_alias": "Parent Sarah",
+    "author_avatar_seed": "avatar1",
+    "title": "Tips for keeping soft arm restraints comfortable during sleep?",
+    "content": "We are getting ready for Leo's lip repair in 4 weeks. Any advice from parents who have gone through this on making sleep more comfortable?",
+    "status": "published",
+    "is_flagged": false,
+    "upvotes_count": 0,
+    "comments_count": 0,
+    "has_reacted": false,
+    "created_at": "2026-09-02T10:00:00Z",
+    "updated_at": "2026-09-02T10:00:00Z"
+  }
+}
+```
 
 ---
 

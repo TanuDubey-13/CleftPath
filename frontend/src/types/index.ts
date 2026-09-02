@@ -6,6 +6,7 @@ export * from './appointments';
 export * from './care';
 export * from './voice';
 export * from './pathguide';
+export * from './village';
 
 export interface Patient {
   id: string;
