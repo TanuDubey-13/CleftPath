@@ -1,94 +1,137 @@
-import React from 'react';
-import { Clock, Plus } from 'lucide-react';
-import { Card } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
+import React, { useState } from 'react';
+import { Compass, RefreshCw, Sparkles } from 'lucide-react';
+import { useAddMilestoneNote, useJourney, useUpdateMilestone } from '../hooks/useJourney';
+import { JourneyMilestone, MilestoneStatus } from '../types';
+import { JourneyOverviewHeader } from '../components/journey/JourneyOverviewHeader';
+import { JourneyStageSection } from '../components/journey/JourneyStageSection';
+import { MilestoneDetailModal } from '../components/journey/MilestoneDetailModal';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { Button } from '../components/ui/Button';
-
-const STAGES = [
-  { id: 0, name: 'Stage 0: Prenatal & Discovery', age: 'Prenatal', status: 'completed' },
-  { id: 1, name: 'Stage 1: Infancy & Feeding Setup', age: '0–3 Months', status: 'completed' },
-  { id: 2, name: 'Stage 2: Primary Lip Repair', age: '3–6 Months', status: 'active', active: true },
-  { id: 3, name: 'Stage 3: Primary Palate Repair', age: '9–18 Months', status: 'upcoming' },
-  { id: 4, name: 'Stage 4: Early Speech & Dental', age: '18m–5 Years', status: 'upcoming' },
-  { id: 5, name: 'Stage 5: Bone Graft & Orthodontics', age: '6–10 Years', status: 'upcoming' },
-  { id: 6, name: 'Stage 6: Adolescent & Orthognathic', age: '11–18 Years', status: 'upcoming' },
-  { id: 7, name: 'Stage 7: Adulthood & Transition', age: '18+ Years', status: 'upcoming' },
-];
+import { Alert } from '../components/ui/Alert';
 
 export const JourneyPage: React.FC = () => {
-  return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Header section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-heading font-bold text-2xl text-teal-900">My Journey Roadmap</h1>
-          <p className="text-sm text-charcoal-600">
-            Longitudinal care pathway tailored for Unilateral Cleft Lip & Palate.
-          </p>
-        </div>
-        <Button variant="primary" size="md" leftIcon={<Plus className="w-4 h-4" />}>
-          Add Custom Milestone
-        </Button>
-      </div>
+  const { data: journey, isLoading, isError, error, refetch } = useJourney();
+  const updateMilestoneMutation = useUpdateMilestone();
+  const addNoteMutation = useAddMilestoneNote();
 
-      {/* Stage Stepper Overview */}
-      <Card className="p-6">
-        <h3 className="font-heading font-bold text-base text-charcoal-900 mb-4">8 Care Stages</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          {STAGES.map((s) => (
-            <div
-              key={s.id}
-              className={`p-3 rounded-xl border text-center transition ${
-                s.active
-                  ? 'border-coral-500 bg-coral-50/60 ring-2 ring-coral-500/20'
-                  : s.status === 'completed'
-                  ? 'border-sage-200 bg-sage-50/50'
-                  : 'border-stone-200 bg-stone-50/50 opacity-70'
-              }`}
-            >
-              <div className="text-[10px] font-bold uppercase tracking-wider text-charcoal-500">{s.age}</div>
-              <div className="text-xs font-bold text-charcoal-900 mt-1 truncate">{s.name.split(':')[1]}</div>
-              <div className="mt-2">
-                {s.status === 'completed' && <Badge variant="sage" size="sm">✓ Done</Badge>}
-                {s.active && <Badge variant="coral" size="sm">Active</Badge>}
-                {s.status === 'upcoming' && <Badge variant="stone" size="sm">Upcoming</Badge>}
-              </div>
-            </div>
+  const [selectedMilestone, setSelectedMilestone] = useState<JourneyMilestone | null>(null);
+
+  // Toggle milestone status (Upcoming -> In Progress -> Completed -> Upcoming)
+  const handleToggleStatus = async (milestoneId: string, currentStatus: MilestoneStatus) => {
+    let nextStatus: MilestoneStatus = 'in_progress';
+    if (currentStatus === 'upcoming') nextStatus = 'in_progress';
+    else if (currentStatus === 'in_progress') nextStatus = 'completed';
+    else if (currentStatus === 'completed') nextStatus = 'upcoming';
+
+    await updateMilestoneMutation.mutateAsync({
+      milestoneId,
+      payload: { status: nextStatus },
+    });
+  };
+
+  // Update status from modal
+  const handleModalUpdateStatus = async (newStatus: MilestoneStatus) => {
+    if (!selectedMilestone) return;
+    const updated = await updateMilestoneMutation.mutateAsync({
+      milestoneId: selectedMilestone.id,
+      payload: { status: newStatus },
+    });
+    setSelectedMilestone(updated);
+  };
+
+  // Add note from modal
+  const handleModalAddNote = async (noteText: string) => {
+    if (!selectedMilestone) return;
+    const newNote = await addNoteMutation.mutateAsync({
+      milestoneId: selectedMilestone.id,
+      payload: { note_text: noteText },
+    });
+    setSelectedMilestone({
+      ...selectedMilestone,
+      notes_count: selectedMilestone.notes_count + 1,
+      notes: [newNote, ...selectedMilestone.notes],
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="py-20 flex flex-col items-center justify-center space-y-3">
+        <LoadingSpinner size="lg" />
+        <p className="text-xs font-medium text-charcoal-600">Loading your longitudinal roadmap...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 space-y-4">
+        <Alert variant="danger" title="Unable to Load Care Journey">
+          {error instanceof Error ? error.message : 'An error occurred while connecting to the server.'}
+        </Alert>
+        <div className="text-center">
+          <Button
+            variant="outline"
+            size="md"
+            onClick={() => refetch()}
+            leftIcon={<RefreshCw className="w-4 h-4" />}
+          >
+            Retry Loading
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!journey || !journey.patient) {
+    return (
+      <div className="bg-white rounded-3xl border border-stone-200 p-8 sm:p-12 text-center max-w-xl mx-auto space-y-4 shadow-warm-sm">
+        <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-900 mx-auto flex items-center justify-center">
+          <Compass className="w-8 h-8 text-teal-900" />
+        </div>
+        <h2 className="font-heading font-bold text-xl text-teal-900">
+          No Care Journey Profile Found
+        </h2>
+        <p className="text-xs text-charcoal-600 leading-relaxed">
+          Create or link a patient profile to begin your customized cleft care roadmap with longitudinal milestones.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 pb-12 animate-fade-in">
+      {/* Journey Overview Banner with Progress */}
+      <JourneyOverviewHeader patient={journey.patient} summary={journey.summary} />
+
+      {/* Longitudinal Stages Timeline */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-heading font-bold text-lg text-teal-900 flex items-center gap-2">
+            <Sparkles className="w-4.5 h-4.5 text-coral-500" />
+            <span>Longitudinal Care Roadmap (8 Stages)</span>
+          </h2>
+        </div>
+
+        <div className="space-y-4">
+          {journey.stages.map((stage) => (
+            <JourneyStageSection
+              key={stage.id}
+              stage={stage}
+              onSelectMilestone={(m) => setSelectedMilestone(m)}
+              onToggleStatus={handleToggleStatus}
+            />
           ))}
         </div>
-      </Card>
-
-      {/* Active Stage Milestones */}
-      <div className="space-y-4">
-        <h3 className="font-heading font-bold text-lg text-teal-900 flex items-center gap-2">
-          <Clock className="w-5 h-5 text-coral-500" />
-          <span>Stage 2 Milestones: Primary Lip Repair</span>
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card variant="waypoint" className="space-y-3">
-            <div className="flex justify-between items-start">
-              <Badge variant="sage" size="sm">Completed</Badge>
-              <span className="text-xs font-mono text-charcoal-500">Aug 20, 2026</span>
-            </div>
-            <h4 className="font-bold text-base text-charcoal-900">Surgical Consultation with Dr. Sterling</h4>
-            <p className="text-xs text-charcoal-600 leading-relaxed">
-              Reviewed pre-surgical markings, incision lines, and post-op arm restraint instructions.
-            </p>
-          </Card>
-
-          <Card variant="waypoint" className="space-y-3 border-l-coral-500">
-            <div className="flex justify-between items-start">
-              <Badge variant="coral" size="sm">In Progress</Badge>
-              <span className="text-xs font-mono text-coral-600 font-bold">Due in 4 Weeks</span>
-            </div>
-            <h4 className="font-bold text-base text-charcoal-900">Primary Lip Repair (Cheiloplasty)</h4>
-            <p className="text-xs text-charcoal-600 leading-relaxed">
-              Scheduled surgery date at Children’s Craniofacial Center. Fasting instructions will begin night prior.
-            </p>
-          </Card>
-        </div>
       </div>
+
+      {/* Milestone Detail & Notes Modal */}
+      <MilestoneDetailModal
+        milestone={selectedMilestone}
+        isOpen={!!selectedMilestone}
+        onClose={() => setSelectedMilestone(null)}
+        onUpdateStatus={handleModalUpdateStatus}
+        onAddNote={handleModalAddNote}
+      />
     </div>
   );
 };
