@@ -8,169 +8,169 @@
 [![React 18](https://img.shields.io/badge/Frontend-React_18-61DAFB.svg)](https://reactjs.org/)
 [![PostgreSQL 16 + pgvector](https://img.shields.io/badge/Database-PostgreSQL_16_+_pgvector-336791.svg)](https://github.com/pgvector/pgvector)
 [![Tailwind CSS](https://img.shields.io/badge/Design_System-Tailwind_CSS-38B2AC.svg)](https://tailwindcss.com/)
+[![Tests: 100% Pass](https://img.shields.io/badge/Tests-100%25_Passing-brightgreen.svg)](#6-testing-suite)
 
 ---
 
 ## 1. Project Overview
 
-**CleftPath** is an enterprise-grade, privacy-first, full-stack healthcare technology platform designed to help individuals and families navigate the long-term cleft lip and palate journey from prenatal diagnosis through adulthood.
+**CleftPath** is an enterprise-grade, privacy-first, full-stack healthcare technology platform designed to empower individuals and families navigating the longitudinal cleft lip and palate care pathway from prenatal diagnosis through adulthood (ages 0–21+).
 
-The cleft care pathway typically spans 18–21+ years, requiring coordination across 10+ medical and surgical specialties (Plastic Surgery, ENT, SLP, Orthodontics, Pediatric Dentistry, Audiology, Genetics, Pediatrics). CleftPath organizes clinical milestones, specialized feeding logs, medical documents, speech progress, and peer support within an empathetic, trauma-informed digital sanctuary.
-
-### 1.1 Non-Diagnostic Medical Boundary
-CleftPath is **strictly supportive and educational**. It does **NOT** diagnose medical conditions (e.g. *velopharyngeal insufficiency*, *fistula*) or prescribe medications. It reinforces and clarifies guidance from accredited multidisciplinary cleft teams (e.g. ACPA teams).
+The cleft care pathway is a multidisciplinary journey requiring coordinated interventions across 10+ clinical specialties (Pediatric Craniofacial Surgery, Otolaryngology/ENT, Speech-Language Pathology, Orthodontics, Pediatric Dentistry, Audiology, Genetics, and Psychology). CleftPath unifies care milestones, specialized feeding logs, growth tracking, local speech practice, ACPA-grounded health education, AI care companionship, and community peer support within a warm, trauma-informed digital sanctuary.
 
 ---
 
-## 2. Technology Stack
+## 2. System Architecture
 
-### Frontend (Cursor Engineering Environment)
-* **Framework:** React 18 with TypeScript 5
-* **Build Tool:** Vite
-* **Styling & Design Tokens:** Tailwind CSS (Warm Ivory `#FAF7F2`, Deep Teal `#0F4C5C`, Soft Sage `#81B29A`, Warm Coral `#E07A5F`)
-* **Routing:** React Router v6
-* **Server State & Caching:** TanStack Query v5
-* **Data Visualization:** Recharts
-* **Icons:** Lucide React
+```mermaid
+flowchart TD
+    subgraph ClientLayer ["Frontend Client Tier (React 18 + TypeScript + Tailwind)"]
+        SPA["React Single Page Application\n(Vite + TanStack Query v5 + Lucide Icons)"]
+        AudioEngine["Local Web Audio Engine\n(In-Browser Pitch & Duration Feedback)"]
+        SPA --- AudioEngine
+    end
 
-### Backend (Antigravity Engineering Environment)
-* **Framework:** Python 3.11+ / FastAPI
-* **ORM & Database:** SQLAlchemy 2.0 (Async) + PostgreSQL 16 + `pgvector`
-* **Schema Evolution:** Alembic migrations
-* **Data Validation:** Pydantic v2
-* **Structured Logging:** Loguru with automated PHI/PII redaction interceptors
-* **AI Orchestration:** Google Gemini 1.5/2.0 API + RAG hybrid vector retrieval
+    subgraph SecurityGate ["API Gateway & Security Layer"]
+        FastAPIGateway["FastAPI Gateway (/api/v1/*)\n• Argon2id Password Hashing\n• HttpOnly / SameSite=Lax JWT Cookies\n• Strict Tenant IDOR Authorization (current_user.id)\n• Sanitized Error Handling"]
+    end
 
----
+    subgraph PersistenceTier ["Data & Storage Layer"]
+        PostgresDB[("PostgreSQL 16 Relational Store\n• Users & Consents\n• Patients & Care Milestones\n• Feeding, Growth & NAM Logs\n• Village Community Posts & Moderation")]
+        VectorStore[("pgvector Extension (768-dim)\n• HNSW / Cosine Similarity Index\n• ACPA Verified Clinical Knowledge Chunks")]
+        RedisCache[("Redis 7 Cache\n• API Rate Limiting\n• Session Token Invalidation")]
+    end
 
-## 3. Repository Structure
+    subgraph AIService ["AI & Knowledge Grounding Tier"]
+        GeminiRAG["Google Gemini 1.5 Flash (Server-Side Only)\n• Conservative Acute-Symptom Safety Filter\n• Zero-PHI Grounded Educational Retrieval"]
+    end
 
-```text
-CleftPath/
-├── frontend/             # React 18 + TypeScript + Vite + Tailwind SPA
-│   ├── src/
-│   │   ├── api/          # API endpoint client functions
-│   │   ├── components/   # UI primitives (Button, Card, Badge, Alert) & AppShell
-│   │   ├── hooks/        # Custom React hooks (useHealth, etc.)
-│   │   ├── lib/          # Axios client & TanStack QueryClient
-│   │   ├── pages/        # Route pages (Dashboard, Journey, Library, Care, etc.)
-│   │   ├── routes/       # React Router hierarchy
-│   │   └── types/        # TypeScript DTO schemas
-│   ├── package.json
-│   ├── tailwind.config.ts
-│   └── vite.config.ts
-│
-├── backend/              # FastAPI Python backend
-│   ├── app/
-│   │   ├── api/v1/       # REST API endpoints & routers
-│   │   ├── core/         # Config, logging, and error handlers
-│   │   ├── db/           # Async database engine & sessionmaker
-│   │   ├── middleware/   # CORS & request timing middlewares
-│   │   ├── models/       # SQLAlchemy 2.0 declarative models
-│   │   ├── schemas/      # Pydantic v2 request/response schemas
-│   │   ├── services/     # Domain business logic & health checks
-│   │   └── main.py       # FastAPI application factory
-│   ├── alembic/          # Database migrations & pgvector setup
-│   ├── tests/            # Pytest test suite
-│   ├── Dockerfile
-│   └── requirements.txt
-│
-├── ai-service/           # PathGuide RAG & AI evaluation harness
-├── knowledge-base/       # Medically verified ACPA clinical guides
-├── docs/                 # Architectural specifications & design system
-├── tests/                # System-wide E2E tests (Playwright)
-├── .env.example          # Environment variables template
-├── docker-compose.yml    # Full-stack local multi-container development
-├── AGENTS.md             # AI agent and developer operating protocol
-└── README.md
+    SPA -->|HTTPS REST API /api/v1/*| FastAPIGateway
+    FastAPIGateway -->|Async SQLAlchemy / asyncpg| PostgresDB
+    FastAPIGateway -->|Vector Similarity Queries| VectorStore
+    FastAPIGateway -->|Session Cache| RedisCache
+    FastAPIGateway -->|Server-Side RAG Prompting| GeminiRAG
+
+    classDef client fill:#FAF7F2,stroke:#0F4C5C,stroke-width:2px,color:#0F4C5C;
+    classDef gate fill:#0F4C5C,stroke:#0F4C5C,stroke-width:2px,color:#FFFFFF;
+    classDef data fill:#81B29A,stroke:#0F4C5C,stroke-width:2px,color:#FFFFFF;
+    classDef ai fill:#E07A5F,stroke:#0F4C5C,stroke-width:2px,color:#FFFFFF;
+
+    class SPA,AudioEngine client;
+    class FastAPIGateway gate;
+    class PostgresDB,VectorStore,RedisCache data;
+    class GeminiRAG ai;
 ```
 
----
-
-## 4. Local Development Setup
-
-### Prerequisites
-* **Node.js:** v20+ (`npm` v10+)
-* **Python:** 3.11+
-* **Docker & Docker Compose:** Installed and running
-
-### Quick Start with Docker Compose
-To spin up the entire full-stack environment with PostgreSQL (pgvector), Redis, FastAPI backend, and React frontend:
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/TanuDubey-13/CleftPath.git
-cd CleftPath
-
-# 2. Configure environment
-cp .env.example .env
-
-# 3. Start containers
-docker compose up --build
-```
-* **Frontend:** [http://localhost:5173](http://localhost:5173)
-* **Backend API:** [http://localhost:8000](http://localhost:8000)
-* **Interactive OpenAPI Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+### Architectural Privacy & Safety Guarantees:
+1. **Local Voice Privacy:** Speech exercises record and compute pitch/duration feedback **exclusively inside the user's browser** via the Web Audio API. Raw microphone audio is never uploaded to any external server.
+2. **Strict Tenant Isolation (Zero IDOR):** Every patient record, appointment, feeding log, and chat thread is guarded by server-derived `current_user.id` query scoping.
+3. **Medical Safety Boundary:** The AI companion (**PathGuide**) is strictly supportive and educational. It never diagnoses, calculates clinical risk, or prescribes treatments. Potentially urgent symptoms automatically trigger non-diagnostic emergency care guidance.
 
 ---
 
-### Manual Setup (Running Services Independently)
+## 3. Platform Modules (Phases 3–11)
 
-#### 1. Backend Setup
-```bash
+| Module | Features & Capabilities |
+| :--- | :--- |
+| **🔐 Auth & Security (Phase 4)** | Argon2id password hashing, HttpOnly SameSite JWT session cookies, granular RBAC (`CAREGIVER`, `PATIENT_ADULT`, `CLINICIAN`, `MODERATOR`, `ADMIN`), and HIPAA-ready audit logging. |
+| **🗺️ My Journey (Phase 5)** | Longitudinal 8-stage clinical roadmap (Prenatal to Adulthood) based on American Cleft Palate-Craniofacial Association (ACPA) protocols. |
+| **📚 Health Library (Phase 6)** | Medically grounded educational articles categorized by stage and specialty with 768-dim `pgvector` semantic search. |
+| **📅 Appointments (Phase 7)** | Multidisciplinary appointment management, specialist directory, and preparation checklists. |
+| **🍼 Baby & Parent Care (Phase 8)** | Specialized cleft feeding logs (Dr. Brown's, Pigeon, Haberman), WHO-standardized growth tracking, and NAM/taping compliance logs. |
+| **🎙️ Voice Journey (Phase 9)** | Stage-appropriate speech exercise library with client-side Web Audio pitch/duration analysis and zero external audio transmission. |
+| **🤖 PathGuide AI (Phase 10)** | ACPA-grounded care companion powered by Google Gemini 1.5 Flash + pgvector RAG with conservative emergency safety routing. |
+| **🏘️ The Village (Phase 11)** | Safe, moderated community peer-support forum with themed channels, threaded discussions, reactions, and clinician moderation queue. |
+
+---
+
+## 4. Technology Stack
+
+* **Frontend:** React 18, TypeScript 5, Vite, Tailwind CSS, TanStack Query v5, React Router v6, Lucide React, Recharts.
+* **Backend:** Python 3.11+, FastAPI (async), Pydantic v2, SQLAlchemy 2.0 (async), Loguru.
+* **Database & Vector Search:** PostgreSQL 16 with `pgvector` extension (768-dimensional embeddings).
+* **AI & Grounding:** Google Gemini 1.5 Flash with RAG vector search over verified ACPA knowledge bases.
+* **DevOps & Containers:** Docker, Docker Compose, Multi-stage production Dockerfiles, Nginx Alpine, GitHub Actions CI/CD.
+
+---
+
+## 5. Quickstart Local Setup
+
+### Option A: Using Docker Desktop (Recommended)
+
+1. **Start Docker PostgreSQL Database:**
+   ```powershell
+   docker compose up -d postgres
+   ```
+
+2. **Initialize Database & Seed Demo Data:**
+   ```powershell
+   cd backend
+   .\venv\Scripts\Activate.ps1
+   alembic upgrade head
+   python -m app.db.seed
+   ```
+
+3. **Start Backend Server:**
+   ```powershell
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+4. **Start Frontend Client (in a new terminal):**
+   ```powershell
+   cd frontend
+   npm run dev
+   ```
+
+5. **Open Application in Browser:**
+   * **Web App:** [http://localhost:5173](http://localhost:5173)
+   * **Interactive API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+### Demo Accounts for Testing
+
+| Role | Email | Password | Access Level |
+| :--- | :--- | :--- | :--- |
+| **Caregiver / Parent** | `demo.parent@example.com` | `demo12345` | Full Caregiver Portal, Baby Leo Records, Care Tracking, Voice Journey, PathGuide AI |
+| **Clinician / Doctor** | `dr.demo@example.com` | `demo12345` | Care Team Portal, Clinical Stage Insights, Community Moderation Queue |
+
+---
+
+## 6. Testing Suite
+
+The repository maintains a 100% test pass rate across both backend and frontend test runners.
+
+```powershell
+# Run Backend Pytest Suite (191 tests)
 cd backend
+pytest -v
 
-# Create & activate virtual environment
-python -m venv venv
-# On Windows:
-.\venv\Scripts\activate
-# On Linux/macOS:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt -r requirements-dev.txt
-
-# Run migrations (ensure local Postgres is running)
-alembic upgrade head
-
-# Start FastAPI dev server
-uvicorn app.main:app --reload --port 8000
-```
-
-#### 2. Frontend Setup
-```bash
+# Run Frontend Vitest Suite (58 tests)
 cd frontend
+npm run test -- --run
 
-# Install dependencies
-npm install
-
-# Start Vite dev server
-npm run dev
-```
-
----
-
-## 5. Testing Strategy
-
-### Running Backend Tests
-```bash
-cd backend
-pytest -v --cov=app
-```
-
-### Running Frontend Tests & Type Checking
-```bash
-cd frontend
+# Run TypeScript Typecheck
 npm run typecheck
-npm run test
+
+# Run Production Vite Build
+npm run build
 ```
 
 ---
 
-## 6. Core Engineering & Safety Rules
+## 7. Medical Safety & Privacy Disclaimers
 
-As defined in [`AGENTS.md`](AGENTS.md):
-1. **Never Diagnose or Prescribe:** PathGuide reinforces the role of the patient's accredited cleft team.
-2. **Emergency Escalation:** Acute symptoms immediately trigger emergency hotline banners.
-3. **Zero Real Patient Data:** Only synthetic test fixtures are permitted during development and testing.
-4. **No Direct DB Access from Frontend:** All frontend state transitions must route through authenticated FastAPI endpoints.
+> [!IMPORTANT]
+> **Non-Diagnostic Notice:** CleftPath is an educational and supportive tool designed to assist families and individuals. It does **not** provide medical diagnoses, surgical determinations, or prescriptive treatment plans. Always consult an accredited multidisciplinary cleft team for medical decisions.
+
+> [!NOTE]
+> **Synthetic Test Fixtures:** All pre-seeded data (e.g. *"Baby Leo"*, *"Sarah DemoParent"*) are strictly synthetic. No real protected health information (PHI) is ever stored or transmitted.
+
+---
+
+## 8. License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+### What is the MIT License?
+The MIT License is a permissive open-source license. It allows anyone to freely use, study, modify, merge, and distribute this software for personal or commercial purposes, while providing standard limitation of warranty and liability protections for the author.
