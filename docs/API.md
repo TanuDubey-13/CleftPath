@@ -245,36 +245,54 @@ Alternatively, browser clients authenticate via an `HttpOnly`, `SameSite=Strict`
 
 ### 2.8 PathGuide AI Chat (`/api/v1/pathguide`)
 
+> **Non-Diagnostic Notice:** PathGuide is an educational navigation companion. It never diagnoses medical conditions, speech disorders, or surgical complications, and never prescribes medications or treatments. Acute symptom triggers act as conservative safety routing to urgent medical care. Retrieval is strictly bounded to published Health Library articles (`health_articles.is_published == True`).
+
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/pathguide/threads` | List active chat threads for current user/patient | Yes |
-| `POST` | `/pathguide/threads` | Create a new conversational thread with patient context | Yes |
-| `GET` | `/pathguide/threads/{thread_id}/messages` | Get message history with citations | Yes |
-| `POST` | `/pathguide/threads/{thread_id}/stream` | **SSE Stream:** Send message and stream grounded response | Yes |
-| `GET` | `/pathguide/suggested-prompts` | Get contextual suggested questions based on child's stage | Yes |
+| `GET` | `/pathguide/suggested-prompts` | Get educational starter prompts | Yes |
+| `GET` | `/pathguide/threads` | List active user's conversation threads | Yes |
+| `POST` | `/pathguide/threads` | Create a new conversation thread | Yes |
+| `GET` | `/pathguide/threads/{thread_id}` | Get thread details and message count | Yes |
+| `PATCH` | `/pathguide/threads/{thread_id}` | Rename conversation thread title | Yes |
+| `DELETE` | `/pathguide/threads/{thread_id}` | Delete conversation thread | Yes |
+| `GET` | `/pathguide/threads/{thread_id}/messages` | List messages in thread with citations | Yes |
+| `POST` | `/pathguide/threads/{thread_id}/messages` | Send message and receive RAG-grounded response | Yes |
 
-#### `POST /pathguide/threads/{thread_id}/stream`
-**SSE Streaming Response Format:**
-```http
-HTTP/1.1 200 OK
-Content-Type: text/event-stream
-Cache-Control: no-cache
-Connection: keep-alive
+#### `POST /api/v1/pathguide/threads/{thread_id}/messages`
+**Request Body:**
+```json
+{
+  "content": "How do specialized cleft feeders like Dr. Brown's or Haberman work?"
+}
+```
 
-event: metadata
-data: {"citations": [{"source_title": "ACPA Feeding Guidelines", "url": "/library/feeding-infants-cleft", "page": 4}]}
-
-event: token
-data: {"text": "When "}
-
-event: token
-data: {"text": "feeding with a "}
-
-event: token
-data: {"text": "SpecialNeeds feeder, keep your baby at a 45-to-60 degree upright angle..."}
-
-event: done
-data: {"message_id": "msg_90a1b2", "safety_status": "grounded_safe"}
+**Response Body:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "e67d2b45-12fa-48b2-8fa0-90c1284d7801",
+    "thread_id": "8a32d184-7e9c-4b53-a5a4-969c3a30f301",
+    "role": "assistant",
+    "content": "Based on CleftPath educational resources (Understanding Specialized Cleft Feeders), specialized feeding systems utilize unidirectional valves and positive pressure assists...\n\nPlease discuss your child's specific feeding routine with your pediatric cleft care team.",
+    "citations": [
+      {
+        "article_id": "4b53d184-7e9c-4b53-a5a4-969c3a30f302",
+        "title": "Understanding Specialized Cleft Feeders",
+        "category": "Feeding & Nutrition",
+        "slug": "understanding-specialized-cleft-feeders",
+        "summary": "A comprehensive clinical comparison of unidirectional valves and assisted squeezing techniques."
+      }
+    ],
+    "safety_flags": {
+      "emergency_trigger_detected": false,
+      "grounded_sources_count": 1,
+      "model": "gemini-1.5-flash"
+    },
+    "tokens_used": 145,
+    "created_at": "2026-09-02T10:00:00Z"
+  }
+}
 ```
 
 ---

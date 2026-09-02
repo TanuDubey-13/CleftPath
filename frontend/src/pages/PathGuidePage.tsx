@@ -1,109 +1,205 @@
-import React, { useState } from 'react';
-import { Sparkles, Send, ShieldCheck } from 'lucide-react';
-import { Badge } from '../components/ui/Badge';
+import React, { useState, useEffect, useRef } from 'react';
+import { Sparkles, MessageSquare, ChevronLeft } from 'lucide-react';
+import { PathGuideCitation } from '../types';
+import {
+  useCreatePathGuideThread,
+  useDeletePathGuideThread,
+  usePathGuideMessages,
+  usePathGuideSuggestedPrompts,
+  usePathGuideThread,
+  usePathGuideThreads,
+  useSendMessage,
+} from '../hooks/usePathGuide';
+import { PathGuideSafetyNotice } from '../components/pathguide/PathGuideSafetyNotice';
+import { PathGuideThreadList } from '../components/pathguide/PathGuideThreadList';
+import { PathGuideMessage } from '../components/pathguide/PathGuideMessage';
+import { PathGuideMessageComposer } from '../components/pathguide/PathGuideMessageComposer';
+import { PathGuideEmptyState } from '../components/pathguide/PathGuideEmptyState';
+import { PathGuideSourceModal } from '../components/pathguide/PathGuideSourceModal';
+import { PathGuideSkeleton } from '../components/pathguide/PathGuideSkeleton';
 import { Button } from '../components/ui/Button';
 
 export const PathGuidePage: React.FC = () => {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      role: 'assistant',
-      content:
-        'Hello Sarah! I am PathGuide, your AI care companion for CleftPath. I can help organize questions for Dr. Sterling, explain feeding bottle techniques, and guide you through upcoming milestones for Baby Leo.',
-      citations: ['ACPA Family Guidelines 2024'],
-    },
-  ]);
-  const [inputValue, setInputValue] = useState('');
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [selectedCitation, setSelectedCitation] = useState<PathGuideCitation | null>(null);
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
-    const userMsg = { id: Date.now(), role: 'user', content: inputValue, citations: [] };
-    setMessages((prev) => [
-      ...prev,
-      userMsg,
-      {
-        id: Date.now() + 1,
-        role: 'assistant',
-        content:
-          'Thank you for your question. When preparing for primary lip repair at 3–6 months, families typically coordinate pre-op bloodwork and ensure specialized bottles are packed. Please note that I am an AI assistant and do not provide medical diagnoses or prescriptions.',
-        citations: ['ACPA Primary Cheiloplasty Care Pathway, p. 12'],
-      },
-    ]);
-    setInputValue('');
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Queries
+  const { data: threadsData, isLoading: isThreadsLoading } = usePathGuideThreads(1, 30);
+  const { data: activeThread } = usePathGuideThread(activeThreadId || undefined);
+  const { data: messagesData, isLoading: isMessagesLoading } = usePathGuideMessages(
+    activeThreadId || undefined,
+    1,
+    100
+  );
+  const { data: suggestedPromptsData } = usePathGuideSuggestedPrompts();
+
+  // Mutations
+  const createThreadMutation = useCreatePathGuideThread();
+  const deleteThreadMutation = useDeletePathGuideThread();
+  const sendMessageMutation = useSendMessage();
+
+  // Auto-select first thread if available and none selected
+  useEffect(() => {
+    if (!activeThreadId && threadsData?.items && threadsData.items.length > 0) {
+      setActiveThreadId(threadsData.items[0].id);
+    }
+  }, [threadsData, activeThreadId]);
+
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    if (messagesEndRef.current && typeof messagesEndRef.current.scrollIntoView === 'function') {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messagesData?.items, sendMessageMutation.isPending]);
+
+  const handleNewThread = async () => {
+    const newThread = await createThreadMutation.mutateAsync({
+      title: 'Care Conversation',
+    });
+    setActiveThreadId(newThread.id);
+    setShowMobileSidebar(false);
   };
 
+  const handleDeleteThread = async (threadId: string) => {
+    await deleteThreadMutation.mutateAsync(threadId);
+    if (activeThreadId === threadId) {
+      setActiveThreadId(null);
+    }
+  };
+
+  const handleSendMessage = async (content: string) => {
+    let currentId = activeThreadId;
+
+    // Create a new thread if none exists
+    if (!currentId) {
+      const newThread = await createThreadMutation.mutateAsync({
+        title: (content.slice(0, 40) + '...') || 'Care Conversation',
+      });
+      currentId = newThread.id;
+      setActiveThreadId(newThread.id);
+    }
+
+    await sendMessageMutation.mutateAsync({
+      threadId: currentId,
+      payload: { content },
+    });
+  };
+
+  if (isThreadsLoading && !threadsData) {
+    return <PathGuideSkeleton />;
+  }
+
+  const messages = messagesData?.items || [];
+  const prompts = suggestedPromptsData?.prompts || [];
+  const lastMessage = messages[messages.length - 1];
+  const hasEmergency = lastMessage?.safety_flags?.emergency_trigger_detected;
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto animate-fadeIn flex flex-col h-[calc(100vh-12rem)]">
-      {/* Header Banner */}
-      <div className="flex items-center justify-between pb-3 border-b border-stone-200">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-teal-900 text-white flex items-center justify-center shadow-warm-sm">
-            <Sparkles className="w-5 h-5 text-coral-400" />
-          </div>
-          <div>
-            <h1 className="font-heading font-bold text-xl text-teal-900">PathGuide AI</h1>
-            <p className="text-xs text-charcoal-600">Grounded in verified ACPA clinical resources</p>
-          </div>
-        </div>
-        <Badge variant="sage" size="sm">
-          <ShieldCheck className="w-3.5 h-3.5" /> Non-Diagnostic Guide
-        </Badge>
+    <div className="space-y-4 animate-fadeIn max-w-7xl mx-auto h-[calc(100vh-8.5rem)] flex flex-col">
+      {/* Top Bar on Mobile for Thread Selection */}
+      <div className="flex md:hidden items-center justify-between bg-white p-3 rounded-2xl border border-stone-200">
+        <button
+          type="button"
+          onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+          className="text-xs font-bold text-teal-900 flex items-center gap-1"
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span>{activeThread ? activeThread.title : 'Select Conversation'}</span>
+        </button>
+        <Button variant="outline" size="sm" onClick={handleNewThread}>
+          New Chat
+        </Button>
       </div>
 
-      {/* Chat Messages Area */}
-      <div className="flex-1 overflow-y-auto space-y-4 pr-2">
-        {messages.map((m) => (
-          <div
-            key={m.id}
-            className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
-          >
-            <div
-              className={`max-w-xl rounded-2xl p-4 text-xs sm:text-sm leading-relaxed shadow-warm-sm ${
-                m.role === 'user'
-                  ? 'bg-teal-900 text-white rounded-br-none'
-                  : 'bg-white border border-stone-200/90 text-charcoal-900 rounded-bl-none'
-              }`}
-            >
-              {m.content}
-
-              {m.citations && m.citations.length > 0 && (
-                <div className="mt-2.5 pt-2 border-t border-stone-100 flex flex-wrap gap-1.5">
-                  {m.citations.map((c, i) => (
-                    <span
-                      key={i}
-                      className="text-[10px] font-semibold text-teal-900 bg-teal-50 px-2 py-0.5 rounded-md"
-                    >
-                      Source: {c}
-                    </span>
-                  ))}
-                </div>
-              )}
+      {/* Main Two-Panel Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1 min-h-0">
+        {/* Left Sidebar: Threads */}
+        <div
+          className={`${
+            showMobileSidebar ? 'fixed inset-0 z-40 bg-white p-4 m-4 rounded-3xl shadow-warm-lg' : 'hidden'
+          } md:block md:relative md:inset-auto md:z-0 md:m-0 md:p-0 md:col-span-1 h-full`}
+        >
+          {showMobileSidebar && (
+            <div className="flex justify-end pb-2 md:hidden">
+              <Button variant="ghost" size="sm" onClick={() => setShowMobileSidebar(false)}>
+                <ChevronLeft className="w-4 h-4 mr-1" /> Back to Chat
+              </Button>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Input Bar */}
-      <div className="pt-2 border-t border-stone-200/80">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask PathGuide about surgical preparation, feeding, or appointments..."
-            className="flex-1 bg-white border border-stone-200 rounded-xl px-4 py-3 text-xs sm:text-sm text-charcoal-900 focus:outline-none focus:ring-2 focus:ring-teal-700/20 focus:border-teal-900"
+          )}
+          <PathGuideThreadList
+            threads={threadsData?.items || []}
+            activeThreadId={activeThreadId}
+            onSelectThread={(id) => {
+              setActiveThreadId(id);
+              setShowMobileSidebar(false);
+            }}
+            onNewThread={handleNewThread}
+            onDeleteThread={handleDeleteThread}
+            isLoading={isThreadsLoading}
           />
-          <Button
-            variant="primary"
-            size="md"
-            onClick={handleSend}
-            rightIcon={<Send className="w-4 h-4" />}
-          >
-            Send
-          </Button>
+        </div>
+
+        {/* Right Panel: Conversation Area */}
+        <div className="md:col-span-3 bg-white border border-stone-200/80 rounded-3xl p-4 sm:p-6 shadow-warm-xs flex flex-col justify-between h-full min-h-0 space-y-4">
+          {/* Top Safety Banner */}
+          <PathGuideSafetyNotice hasEmergencyTrigger={hasEmergency} />
+
+          {/* Messages Stream */}
+          <div className="flex-1 overflow-y-auto pr-2 space-y-4 min-h-0">
+            {isMessagesLoading && messages.length === 0 ? (
+              <div className="p-8 text-center text-charcoal-600 text-xs">
+                Loading messages...
+              </div>
+            ) : messages.length === 0 ? (
+              <PathGuideEmptyState
+                prompts={prompts}
+                onSelectPrompt={(text) => handleSendMessage(text)}
+              />
+            ) : (
+              messages.map((m) => (
+                <PathGuideMessage
+                  key={m.id}
+                  message={m}
+                  onSelectCitation={(cit) => setSelectedCitation(cit)}
+                />
+              ))
+            )}
+
+            {/* In-Flight Sending Indicator */}
+            {sendMessageMutation.isPending && (
+              <div className="flex items-start gap-2.5 animate-fadeIn">
+                <div className="w-8 h-8 rounded-xl bg-coral-500 text-white flex items-center justify-center shadow-warm-xs">
+                  <Sparkles className="w-4 h-4 animate-spin" />
+                </div>
+                <div className="bg-ivory-50 border border-stone-200 rounded-3xl rounded-tl-none p-4 text-xs text-charcoal-600 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-teal-900 animate-pulse" />
+                  <span>Searching Health Library & formulating grounded explanation...</span>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Composer Input Bar */}
+          <div className="pt-2 border-t border-stone-100">
+            <PathGuideMessageComposer
+              onSendMessage={handleSendMessage}
+              isSending={sendMessageMutation.isPending}
+            />
+          </div>
         </div>
       </div>
+
+      {/* Cited Source Modal */}
+      <PathGuideSourceModal
+        citation={selectedCitation}
+        isOpen={!!selectedCitation}
+        onClose={() => setSelectedCitation(null)}
+      />
     </div>
   );
 };

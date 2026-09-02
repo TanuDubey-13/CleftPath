@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import appointments, auth, care, health, health_library, journey, voice
+from app.api.v1.endpoints import appointments, auth, care, health, health_library, journey, pathguide, voice
 
 api_v1_router = APIRouter()
 
@@ -13,3 +13,4 @@ api_v1_router.include_router(appointments.router, prefix="/appointments", tags=[
 api_v1_router.include_router(care.router, prefix="/care", tags=["Baby & Parent Care"])
 api_v1_router.include_router(care.router, prefix="/baby-care", tags=["Baby & Parent Care"])
 api_v1_router.include_router(voice.router, prefix="/voice", tags=["Voice Journey"])
+api_v1_router.include_router(pathguide.router, prefix="/pathguide", tags=["PathGuide AI"])

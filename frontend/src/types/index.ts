@@ -5,6 +5,7 @@ export * from './health_library';
 export * from './appointments';
 export * from './care';
 export * from './voice';
+export * from './pathguide';
 
 export interface Patient {
   id: string;
