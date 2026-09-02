@@ -45,6 +45,7 @@ export const router = createBrowserRouter([
       { path: 'library/:articleId', element: <HealthArticleDetailPage /> },
       { path: 'appointments', element: <AppointmentsPage /> },
       { path: 'care', element: <BabyCarePage /> },
+      { path: 'baby-care', element: <BabyCarePage /> },
       { path: 'voice', element: <VoicePage /> },
       { path: 'pathguide', element: <PathGuidePage /> },
       { path: 'village', element: <VillagePage /> },

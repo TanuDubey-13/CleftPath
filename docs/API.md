@@ -177,28 +177,38 @@ Alternatively, browser clients authenticate via an `HttpOnly`, `SameSite=Strict`
 
 ---
 
-### 2.6 Baby & Parent Care (`/api/v1/patients/{patient_id}/baby-care`)
+### 2.6 Baby & Parent Care (`/api/v1/care` and `/api/v1/baby-care`)
 
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/{patient_id}/baby-care/feeding` | Get feeding logs with aggregate daily volume metrics | Yes |
-| `POST` | `/{patient_id}/baby-care/feeding` | Log a feeding session (volume, bottle type, duration) | Yes |
-| `GET` | `/{patient_id}/baby-care/growth` | Get weight/height logs plotted against WHO percentiles | Yes |
-| `POST` | `/{patient_id}/baby-care/growth` | Record a new weight or length measurement | Yes |
-| `GET` | `/{patient_id}/baby-care/nam` | Get NAM (Nasoalveolar Molding) wear logs | Yes |
-| `POST` | `/{patient_id}/baby-care/nam` | Log NAM appliance tape change, skin check, and hours | Yes |
+| `GET` | `/care/overview` | Aggregated metrics (today's volume, latest weight, NAM hours, guidance) | Yes |
+| `GET` | `/care/feeding` | List feeding logs with date range and pagination | Yes |
+| `GET` | `/care/feeding/{log_id}` | Get single feeding log detail | Yes |
+| `POST` | `/care/feeding` | Log a specialty feeding session (volume, bottle type, duration, burps) | Yes |
+| `PATCH`| `/care/feeding/{log_id}` | Update feeding log fields | Yes |
+| `DELETE`| `/care/feeding/{log_id}` | Delete feeding log record | Yes |
+| `GET` | `/care/growth` | List growth and physical measurement records | Yes |
+| `GET` | `/care/growth/{record_id}` | Get single growth measurement detail | Yes |
+| `POST` | `/care/growth` | Record weight, length/height, or head circumference | Yes |
+| `PATCH`| `/care/growth/{record_id}` | Update growth measurement fields | Yes |
+| `DELETE`| `/care/growth/{record_id}` | Delete growth measurement record | Yes |
+| `GET` | `/care/nam` | List NAM (Nasoalveolar Molding) wear logs | Yes |
+| `GET` | `/care/nam/{log_id}` | Get single NAM wear log detail | Yes |
+| `POST` | `/care/nam` | Log daily NAM wear hours, tape change, and skin condition | Yes |
+| `PATCH`| `/care/nam/{log_id}` | Update NAM wear log | Yes |
+| `DELETE`| `/care/nam/{log_id}` | Delete NAM wear log record | Yes |
 
-#### `POST /{patient_id}/baby-care/feeding`
+#### `POST /api/v1/care/feeding`
 **Request Body:**
 ```json
 {
   "logged_at": "2026-09-02T08:30:00Z",
-  "feeding_method": "dr_browns_specialty_feeder",
+  "bottle_type": "dr_browns_specialty",
   "volume_ml": 110,
   "duration_minutes": 25,
   "burping_breaks": 3,
-  "reflux_level": "mild",
-  "notes": "Fed in upright 60-degree angle, transitioned to blue valve smoothly."
+  "reflux_severity": "mild",
+  "notes": "Fed in upright 60-degree angle, latched to blue valve smoothly."
 }
 ```
 
