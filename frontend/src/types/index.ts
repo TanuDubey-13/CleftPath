@@ -1,0 +1,31 @@
+export * from './health';
+
+export type UserRole = 'caregiver' | 'patient_adult' | 'clinician' | 'moderator' | 'admin';
+
+export interface User {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: UserRole;
+}
+
+export interface Patient {
+  id: string;
+  display_name: string;
+  date_of_birth: string;
+  gender: string;
+  cleft_type_summary: string;
+  current_stage_id: number;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  meta?: {
+    page?: number;
+    limit?: number;
+    total?: number;
+  };
+  timestamp?: string;
+}
