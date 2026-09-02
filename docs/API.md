@@ -216,12 +216,30 @@ Alternatively, browser clients authenticate via an `HttpOnly`, `SameSite=Strict`
 
 ### 2.7 Voice Journey (`/api/v1/voice`)
 
+> **Non-Diagnostic Notice:** Voice Journey endpoints provide educational practice prompts and session tracking only. No speech diagnosis, clinical acoustic scoring, or automated treatment recommendations are performed. Audio recordings are previewed locally via browser Web MediaRecorder and are never sent to external AI/Gemini or public endpoints.
+
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/voice/exercises` | List SLP-recommended speech practice prompts | Yes |
-| `GET` | `/voice/exercises/{id}` | Get audio sample, phoneme targets, and visual game assets | Yes |
-| `POST` | `/{patient_id}/voice/sessions` | Upload recorded practice session audio for feature analysis | Yes |
-| `GET` | `/{patient_id}/voice/progress` | Get longitudinal articulation consistency & volume stats | Yes |
+| `GET` | `/voice/overview` | Practice metrics, total minutes, and educational guidance | Yes |
+| `GET` | `/voice/exercises` | List speech practice exercises with stage/difficulty filters | Yes |
+| `GET` | `/voice/exercises/{exercise_id}` | Get exercise details, phonemes, and caregiver instructions | Yes |
+| `GET` | `/voice/sessions` | List user's practice sessions with pagination and date filter | Yes |
+| `GET` | `/voice/sessions/{session_id}` | Get single session detail with IDOR verification | Yes |
+| `POST` | `/voice/sessions` | Log a voice practice session | Yes |
+| `PATCH` | `/voice/sessions/{session_id}` | Update session duration, repetition count, or notes | Yes |
+| `DELETE` | `/voice/sessions/{session_id}` | Delete a practice session record | Yes |
+
+#### `POST /api/v1/voice/sessions`
+**Request Body:**
+```json
+{
+  "exercise_id": "8a32d184-7e9c-4b53-a5a4-969c3a30f301",
+  "duration_seconds": 45,
+  "repetition_count": 3,
+  "parent_notes": "Child laughed and practiced repetitive /pa/ and /ba/ sounds.",
+  "audio_s3_key": "local_session/1725280000"
+}
+```
 
 ---
 
