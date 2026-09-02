@@ -164,17 +164,16 @@ Alternatively, browser clients authenticate via an `HttpOnly`, `SameSite=Strict`
 
 ---
 
-### 2.5 Appointments & Care Team (`/api/v1/patients/{patient_id}/appointments`)
+### 2.5 Appointments & Care Team (`/api/v1/appointments`)
 
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/{patient_id}/appointments` | List past and upcoming clinical visits | Yes |
-| `POST` | `/{patient_id}/appointments` | Schedule a new specialist appointment | Yes |
-| `GET` | `/appointments/{id}` | Get appointment details and generated prep sheet | Yes |
-| `POST` | `/appointments/{id}/generate-prep-sheet` | Trigger AI generation of 5 tailored specialist questions | Yes |
-| `POST` | `/appointments/{id}/visit-summary` | Save doctor summary notes or transcribed voice memo | Yes |
-| `GET` | `/{patient_id}/care-team` | List all linked multidisciplinary specialists | Yes |
-| `POST` | `/{patient_id}/care-team` | Add specialist contact (Surgeon, SLP, ENT, Orthodontist) | Yes |
+| `GET` | `/appointments` | List appointments with timeframe (upcoming/past/all), status, and pagination | Yes |
+| `GET` | `/appointments/care-team` | List multidisciplinary specialists linked to patient | Yes |
+| `GET` | `/appointments/{id}` | Get appointment details with prep questions and care team info | Yes |
+| `POST` | `/appointments` | Schedule a new appointment with date, duration, and prep questions | Yes |
+| `PATCH`| `/appointments/{id}` | Update appointment fields or transition status | Yes |
+| `POST` | `/appointments/{id}/cancel` | Cancel a scheduled appointment with audit logging | Yes |
 
 ---
 
