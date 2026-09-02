@@ -1,5 +1,5 @@
 import json
-from typing import List, Union
+from typing import List, Optional, Union
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -54,6 +54,12 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
+    # Cookie Settings
+    COOKIE_NAME: str = "cleftpath_access_token"
+    COOKIE_SECURE: bool = False  # Set to True in production with TLS
+    COOKIE_SAMESITE: str = "lax"
+    COOKIE_DOMAIN: Optional[str] = None
 
     # Google Gemini AI
     GEMINI_API_KEY: str = ""

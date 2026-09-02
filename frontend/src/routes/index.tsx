@@ -1,21 +1,38 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import { AppShell } from '../components/layout/AppShell';
+import { AppointmentsPage } from '../pages/AppointmentsPage';
+import { BabyCarePage } from '../pages/BabyCarePage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { JourneyPage } from '../pages/JourneyPage';
 import { LibraryPage } from '../pages/LibraryPage';
-import { AppointmentsPage } from '../pages/AppointmentsPage';
-import { BabyCarePage } from '../pages/BabyCarePage';
-import { VoicePage } from '../pages/VoicePage';
-import { PathGuidePage } from '../pages/PathGuidePage';
-import { VillagePage } from '../pages/VillagePage';
-import { ProfilePage } from '../pages/ProfilePage';
-import { SettingsPage } from '../pages/SettingsPage';
+import { LoginPage } from '../pages/LoginPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
+import { PathGuidePage } from '../pages/PathGuidePage';
+import { ProfilePage } from '../pages/ProfilePage';
+import { RegisterPage } from '../pages/RegisterPage';
+import { SettingsPage } from '../pages/SettingsPage';
+import { VillagePage } from '../pages/VillagePage';
+import { VoicePage } from '../pages/VoicePage';
 
 export const router = createBrowserRouter([
+  // Public Authentication Routes
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />,
+  },
+  // Protected Application Routes
   {
     path: '/',
-    element: <AppShell />,
+    element: (
+      <ProtectedRoute>
+        <AppShell />
+      </ProtectedRoute>
+    ),
     errorElement: <NotFoundPage />,
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },

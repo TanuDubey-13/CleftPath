@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, it, expect } from 'vitest';
 import { AppShell } from './components/layout/AppShell';
+import { AuthProvider } from './context/AuthContext';
 
 describe('App Layout & Navigation', () => {
   const queryClient = new QueryClient({
@@ -14,9 +15,11 @@ describe('App Layout & Navigation', () => {
   it('renders the brand title and navigation links in AppShell', () => {
     render(
       <QueryClientProvider client={queryClient}>
-        <MemoryRouter initialEntries={['/dashboard']}>
-          <AppShell />
-        </MemoryRouter>
+        <AuthProvider>
+          <MemoryRouter initialEntries={['/dashboard']}>
+            <AppShell />
+          </MemoryRouter>
+        </AuthProvider>
       </QueryClientProvider>
     );
 

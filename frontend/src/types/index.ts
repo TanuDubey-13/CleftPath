@@ -1,14 +1,5 @@
 export * from './health';
-
-export type UserRole = 'caregiver' | 'patient_adult' | 'clinician' | 'moderator' | 'admin';
-
-export interface User {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: UserRole;
-}
+export * from './auth';
 
 export interface Patient {
   id: string;

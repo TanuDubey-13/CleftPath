@@ -4,6 +4,7 @@ const baseURL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export const apiClient = axios.create({
   baseURL,
+  withCredentials: true, // Automatically attach and receive HttpOnly session cookies
   headers: {
     'Content-Type': 'application/json',
   },

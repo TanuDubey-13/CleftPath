@@ -1,7 +1,8 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
-import { Bell, Sparkles, Activity, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Bell, Sparkles, Activity, ShieldCheck, AlertTriangle, LogOut } from 'lucide-react';
 import { useHealth } from '../../hooks/useHealth';
+import { useAuth } from '../../hooks/useAuth';
 import { Badge } from '../ui/Badge';
 
 const ROUTE_TITLES: Record<string, { title: string; subtitle: string }> = {
@@ -19,11 +20,22 @@ const ROUTE_TITLES: Record<string, { title: string; subtitle: string }> = {
 
 export const Header: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { data: health, isPending, isError } = useHealth();
+  const { user, logout } = useAuth();
 
   const currentMeta = ROUTE_TITLES[location.pathname] || {
     title: 'CleftPath',
     subtitle: 'Every journey deserves a path forward',
+  };
+
+  const userInitials = user
+    ? `${user.first_name[0] || ''}${user.last_name[0] || ''}`.toUpperCase() || 'U'
+    : 'DL';
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
   };
 
   return (
@@ -58,7 +70,7 @@ export const Header: React.FC = () => {
 
           {/* Quick PathGuide Launch Button */}
           <button
-            onClick={() => window.location.assign('/pathguide')}
+            onClick={() => navigate('/pathguide')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 text-teal-900 hover:bg-teal-100 text-xs font-semibold border border-teal-200/60 transition shadow-sm"
             title="Open PathGuide AI"
           >
@@ -72,10 +84,24 @@ export const Header: React.FC = () => {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-coral-500 ring-2 ring-white"></span>
           </button>
 
-          {/* User Profile Avatar */}
-          <div className="w-8 h-8 rounded-full bg-teal-900 text-white flex items-center justify-center font-bold text-xs shadow-warm-sm ring-2 ring-teal-900/10">
-            SJ
+          {/* User Profile Avatar with Role Tooltip */}
+          <div
+            className="w-8 h-8 rounded-full bg-teal-900 text-white flex items-center justify-center font-bold text-xs shadow-warm-sm ring-2 ring-teal-900/10 cursor-pointer"
+            title={user ? `${user.first_name} ${user.last_name} (${user.role})` : 'Demo Profile'}
+          >
+            {userInitials}
           </div>
+
+          {/* Logout Button */}
+          {user && (
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-xl text-charcoal-500 hover:text-rose-700 hover:bg-rose-50 transition"
+              title="Sign Out"
+            >
+              <LogOut className="w-4.5 h-4.5" />
+            </button>
+          )}
         </div>
       </div>
     </header>
