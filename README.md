@@ -137,18 +137,20 @@ CleftPath/
 
 ---
 
-## 4. Platform Modules (Phases 3–11)
+## 4. Platform Implementation Roadmap (Phases 0–11)
 
-| Module | Features & Capabilities |
-| :--- | :--- |
-| **🔐 Auth & Security (Phase 4)** | Argon2id password hashing, HttpOnly SameSite JWT session cookies, granular RBAC (`CAREGIVER`, `PATIENT_ADULT`, `CLINICIAN`, `MODERATOR`, `ADMIN`), and HIPAA-ready audit logging. |
-| **🗺️ My Journey (Phase 5)** | Longitudinal 8-stage clinical roadmap (Prenatal to Adulthood) based on American Cleft Palate-Craniofacial Association (ACPA) protocols. |
-| **📚 Health Library (Phase 6)** | Medically grounded educational articles categorized by stage and specialty with 768-dim `pgvector` semantic search. |
-| **📅 Appointments (Phase 7)** | Multidisciplinary appointment management, specialist directory, and preparation checklists. |
-| **🍼 Baby & Parent Care (Phase 8)** | Specialized cleft feeding logs (Dr. Brown's, Pigeon, Haberman), WHO-standardized growth tracking, and NAM/taping compliance logs. |
-| **🎙️ Voice Journey (Phase 9)** | Stage-appropriate speech exercise library with client-side Web Audio pitch/duration analysis and zero external audio transmission. |
-| **🤖 PathGuide AI (Phase 10)** | ACPA-grounded care companion powered by Google Gemini 1.5 Flash + pgvector RAG with conservative emergency safety routing. |
-| **🏘️ The Village (Phase 11)** | Safe, moderated community peer-support forum with themed channels, threaded discussions, reactions, and clinician moderation queue. |
+| Phase | Module | Features & Capabilities |
+| :---: | :--- | :--- |
+| **0–2** | **🏗️ Foundations & Design** | Repository scaffold, trauma-informed design tokens (Warm Ivory, Deep Teal, Soft Sage), and full technical/medical architecture specifications. |
+| **3** | **🗄️ Database & pgvector** | PostgreSQL 16 schema, 768-dimensional `pgvector` similarity indices, Alembic migrations, and synthetic clinical seed fixtures. |
+| **4** | **🔐 Auth & Security** | Argon2id password hashing, HttpOnly SameSite JWT session cookies, granular RBAC (`CAREGIVER`, `PATIENT_ADULT`, `CLINICIAN`, `MODERATOR`, `ADMIN`), and HIPAA-ready audit logging. |
+| **5** | **🗺️ My Journey** | Longitudinal 8-stage clinical roadmap (Prenatal to Adulthood) based on American Cleft Palate-Craniofacial Association (ACPA) protocols. |
+| **6** | **📚 Health Library** | Medically grounded educational articles categorized by stage and specialty with 768-dim `pgvector` semantic search. |
+| **7** | **📅 Appointments** | Multidisciplinary appointment management, specialist directory, and preparation checklists. |
+| **8** | **🍼 Baby & Parent Care** | Specialized cleft feeding logs (Dr. Brown's, Pigeon, Haberman), WHO-standardized growth tracking, and NAM/taping compliance logs. |
+| **9** | **🎙️ Voice Journey** | Stage-appropriate speech exercise library with client-side Web Audio pitch/duration analysis and zero external audio transmission. |
+| **10** | **🤖 PathGuide AI** | ACPA-grounded care companion powered by Google Gemini 1.5 Flash + pgvector RAG with conservative emergency safety routing. |
+| **11** | **🏘️ The Village** | Safe, moderated community peer-support forum with themed channels, threaded discussions, reactions, and clinician moderation queue. |
 
 ---
 
