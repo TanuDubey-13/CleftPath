@@ -9,37 +9,17 @@
 ## 1. Project Overview & Environment Segregation
 
 CleftPath is a privacy-first, full-stack, AI-assisted healthcare technology platform supporting individuals and families across the longitudinal cleft lip and palate journey.
+### 1.1 Development Workflow
 
-### 1.1 Development Agent
+This repository uses AI-assisted development tools for implementation, debugging,
+testing, documentation, and verification.
 
-**Antigravity is the primary development agent for the entire CleftPath repository.**
+All development tools and agents must follow the architecture, security, privacy,
+medical-safety, testing, and design-system requirements defined in this document
+and the `docs/` directory.
 
-Antigravity is responsible for:
-
-- Frontend Engineering (`frontend/`)
-  - React, TypeScript, Vite, Tailwind CSS, TanStack Query, Recharts, React Hook Form, Zod.
-
-- Backend Engineering (`backend/`)
-  - Python 3.11+, FastAPI, SQLAlchemy 2.0 Async, Alembic, PostgreSQL 16 + pgvector.
-
-- AI/ML Engineering (`ai-service/`)
-  - Google Gemini API, RAG pipelines, embeddings, AI safety and evaluation.
-
-- Knowledge Base (`knowledge-base/`)
-  - Health content, source verification, retrieval and grounding.
-
-- Testing
-  - Pytest, Vitest, React Testing Library, Playwright.
-
-- Infrastructure & Deployment
-  - Docker, Docker Compose, CI/CD, cloud deployment and environment configuration.
-
-- Documentation
-  - Architecture, API, database, security, AI, testing and deployment documentation.
-
-All implementation, debugging, testing, verification, and documentation work should be performed through Antigravity unless a specific external tool is explicitly required.
-
-Antigravity must follow all architecture, security, privacy, medical-safety, and design-system rules defined in this document and the `docs/` directory.
+The developer remains responsible for reviewing, validating, and approving all
+changes before they are committed or deployed.
 
 ---
 
