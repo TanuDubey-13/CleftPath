@@ -446,6 +446,94 @@ Infants born with an intact secondary palate generate negative intraoral suction
         )
         session.add_all([chunk1, chunk2])
 
+    # Article 2: Surgery Prep
+    art2_res = await session.execute(
+        select(HealthArticle).where(HealthArticle.slug == "preparing-for-primary-lip-repair")
+    )
+    if not art2_res.scalar_one_or_none():
+        article2 = HealthArticle(
+            id=uuid.uuid4(),
+            title="Preparing for Primary Lip Repair (Cheiloplasty): What Parents Should Expect",
+            slug="preparing-for-primary-lip-repair",
+            category="Surgery Prep & Recovery",
+            stage_id=2,
+            summary="Essential pre-operative instructions, surgical timeline, fasting guidelines, and post-operative arm restraint recovery routines for infant lip repair.",
+            content_markdown="""# Preparing for Primary Lip Repair (Cheiloplasty)
+
+Primary lip repair (cheiloplasty) is typically scheduled between 3 and 6 months of age, once your baby achieves steady weight gain and clearance from pediatric anesthesia.
+
+### Pre-Surgical Checklist
+* **Fasting Guidelines:** Adhere strictly to the hospital's NPO (nothing by mouth) window for breast milk, formula, or clear liquids.
+* **Health Check:** Contact the cleft surgical coordinator if your baby develops a fever, cough, or congestion in the 7 days preceding surgery.
+* **Packing Essentials:** Bring button-front or zippered shirts (to avoid pulling clothing over the head), your specialized feeder, and soothing comfort blankets.
+
+### Post-Operative Care
+* **Incision Care:** Gently clean incision lines with sterile saline using a soft cotton applicator as directed by your surgeon.
+* **Arm Restraints (No-No's):** Soft elbow immobilizers prevent babies from touching surgical sutures while allowing full shoulder movement.
+""",
+            author_source="American Cleft Palate-Craniofacial Association (ACPA)",
+            clinical_verified_by="Pediatric Craniofacial Surgical Committee",
+            is_published=True,
+            version=1,
+        )
+        session.add(article2)
+
+    # Article 3: Speech
+    art3_res = await session.execute(
+        select(HealthArticle).where(HealthArticle.slug == "early-speech-sound-development")
+    )
+    if not art3_res.scalar_one_or_none():
+        article3 = HealthArticle(
+            id=uuid.uuid4(),
+            title="Early Speech Sound Development: Nurturing Vocalizations in Cleft Palate Infants",
+            slug="early-speech-sound-development",
+            category="Speech & Development",
+            stage_id=4,
+            summary="Guidance for parents on encouraging pressure consonant babbling, monitoring nasal resonance, and early speech-language therapy milestones.",
+            content_markdown="""# Early Speech Sound Development
+
+Before palate repair surgery, infants cannot generate high intraoral air pressure required for plosive sounds like /p/, /b/, /t/, and /d/. Nasal consonants like /m/ and /n/ and vowel sounds predominate early vocalizations.
+
+### Practical Communication Strategies
+* **Face-to-Face Babble Play:** Imitate your child's vocalizations, emphasizing lip sounds (/ba/, /ma/, /pa/) during reciprocal play.
+* **Language Enrichment:** Label everyday items, read books with repetitive sound patterns, and reinforce early gestures.
+* **Monitoring Hearing:** Middle ear fluid (otitis media with effusion) is common with cleft palate. Consistent audiological assessments ensure clear auditory input for speech acquisition.
+""",
+            author_source="Cleft Palate Speech-Language Pathology Guidelines",
+            clinical_verified_by="Speech-Language Pathology Clinical Advisory",
+            is_published=True,
+            version=1,
+        )
+        session.add(article3)
+
+    # Article 4: Orthodontics / NAM
+    art4_res = await session.execute(
+        select(HealthArticle).where(HealthArticle.slug == "caring-for-nam-appliance")
+    )
+    if not art4_res.scalar_one_or_none():
+        article4 = HealthArticle(
+            id=uuid.uuid4(),
+            title="Presurgical Infant Orthopedics: Caring for the NAM Appliance",
+            slug="caring-for-nam-appliance",
+            category="Orthodontics & Dental",
+            stage_id=1,
+            summary="Step-by-step instructions for cleaning Nasoalveolar Molding (NAM) plates, skin protection techniques for tape adhesives, and adjustment visit timelines.",
+            content_markdown="""# Presurgical Infant Orthopedics: Caring for the NAM Appliance
+
+Nasoalveolar Molding (NAM) gently approximates the alveolar cleft segments and aligns nasal cartilage before primary lip repair.
+
+### Daily Appliance Hygiene
+1. **Cleaning:** Clean the acrylic molding plate twice daily with cool or lukewarm water and a soft-bristled baby toothbrush. Never use boiling water or harsh chemicals.
+2. **Skin Barrier Film:** Apply non-alcohol skin barrier wipes to baby's cheeks before placing retention tapes to protect delicate infant skin.
+3. **Tape Tension:** Verify that elastic tension matches the orthodontist's prescribed caliper calibration.
+""",
+            author_source="Craniofacial Orthodontic Protocol Series",
+            clinical_verified_by="Pediatric Craniofacial Orthodontics Team",
+            is_published=True,
+            version=1,
+        )
+        session.add(article4)
+
     await session.commit()
     logger.info("Synthetic database seeding completed successfully.")
 

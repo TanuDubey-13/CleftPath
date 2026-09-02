@@ -154,15 +154,13 @@ Alternatively, browser clients authenticate via an `HttpOnly`, `SameSite=Strict`
 
 ---
 
-### 2.4 Health Library (`/api/v1/library`)
+### 2.4 Health Library (`/api/v1/health-library` and `/api/v1/library`)
 
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/library/articles` | List articles with stage, category, and keyword filters | No (Public) |
-| `GET` | `/library/articles/{slug}` | Get full article content, citations, and related resources | No (Public) |
-| `GET` | `/library/categories` | List all library categories and stage tags | No (Public) |
-| `POST` | `/library/search` | Semantic hybrid search across verified clinical library | No (Public) |
-| `POST` | `/library/bookmarks/{article_id}` | Save article to user bookmarks | Yes |
+| `GET` | `/health-library/articles` | List articles with pagination, category, stage, and search keyword filters | Yes |
+| `GET` | `/health-library/articles/{article_id}` | Get full article markdown content, reading time, citations, and clinical verification | Yes |
+| `GET` | `/health-library/categories` | List all library categories with published article counts | Yes |
 
 ---
 

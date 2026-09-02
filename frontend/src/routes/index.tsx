@@ -5,7 +5,8 @@ import { AppointmentsPage } from '../pages/AppointmentsPage';
 import { BabyCarePage } from '../pages/BabyCarePage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { JourneyPage } from '../pages/JourneyPage';
-import { LibraryPage } from '../pages/LibraryPage';
+import { HealthLibraryPage } from '../pages/HealthLibraryPage';
+import { HealthArticleDetailPage } from '../pages/HealthArticleDetailPage';
 import { LoginPage } from '../pages/LoginPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { PathGuidePage } from '../pages/PathGuidePage';
@@ -38,7 +39,10 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'journey', element: <JourneyPage /> },
-      { path: 'library', element: <LibraryPage /> },
+      { path: 'health-library', element: <HealthLibraryPage /> },
+      { path: 'health-library/:articleId', element: <HealthArticleDetailPage /> },
+      { path: 'library', element: <HealthLibraryPage /> },
+      { path: 'library/:articleId', element: <HealthArticleDetailPage /> },
       { path: 'appointments', element: <AppointmentsPage /> },
       { path: 'care', element: <BabyCarePage /> },
       { path: 'voice', element: <VoicePage /> },

@@ -1,6 +1,7 @@
 export * from './health';
 export * from './auth';
 export * from './journey';
+export * from './health_library';
 
 export interface Patient {
   id: string;
