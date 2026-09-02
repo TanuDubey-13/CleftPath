@@ -8,7 +8,7 @@
 [![React 18](https://img.shields.io/badge/Frontend-React_18-61DAFB.svg)](https://reactjs.org/)
 [![PostgreSQL 16 + pgvector](https://img.shields.io/badge/Database-PostgreSQL_16_+_pgvector-336791.svg)](https://github.com/pgvector/pgvector)
 [![Tailwind CSS](https://img.shields.io/badge/Design_System-Tailwind_CSS-38B2AC.svg)](https://tailwindcss.com/)
-[![Tests: 100% Pass](https://img.shields.io/badge/Tests-100%25_Passing-brightgreen.svg)](#6-testing-suite)
+[![Tests: 100% Pass](https://img.shields.io/badge/Tests-100%25_Passing-brightgreen.svg)](#7-testing-suite)
 
 ---
 
@@ -68,7 +68,76 @@ flowchart TD
 
 ---
 
-## 3. Platform Modules (Phases 3–11)
+## 3. Project Directory Structure
+
+```text
+CleftPath/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                # Automated CI/CD pipeline (PostgreSQL+pgvector test runner)
+│
+├── backend/                      # FastAPI Python Application
+│   ├── alembic/                  # Database migration scripts
+│   │   └── versions/             # Schema & pgvector migration versions
+│   ├── app/
+│   │   ├── api/v1/               # REST API Endpoints & Routers
+│   │   │   ├── endpoints/        # auth, journey, care, voice, pathguide, village, health
+│   │   │   └── router.py         # Primary API v1 route aggregator
+│   │   ├── core/                 # App configuration, security (Argon2id/JWT), exception handlers
+│   │   ├── db/                   # Database engine, sessionmaker, and synthetic seed fixtures
+│   │   ├── middleware/           # CORS, timing, and security logging middlewares
+│   │   ├── models/               # SQLAlchemy 2.0 declarative database models
+│   │   ├── schemas/              # Pydantic v2 DTO request/response schemas
+│   │   ├── services/             # Domain business logic & RAG vector search
+│   │   └── main.py               # FastAPI application entry point
+│   ├── tests/                    # Backend Pytest test suite (191 tests, 100% pass)
+│   ├── Dockerfile                # Multi-stage Python 3.11 production container
+│   └── requirements.txt          # Python dependencies
+│
+├── frontend/                     # React 18 + TypeScript Single Page App
+│   ├── src/
+│   │   ├── api/                  # Axios HTTP clients for backend endpoints
+│   │   ├── components/           # UI primitives, layout AppShell, and feature components
+│   │   │   ├── appointments/     # Appointment booking and specialist directory
+│   │   │   ├── care/             # Feeding logs, growth charts, and NAM tracking
+│   │   │   ├── health/           # Health library search and category browsing
+│   │   │   ├── journey/          # Longitudinal roadmap & milestone cards
+│   │   │   ├── pathguide/        # AI conversation threads and suggested prompts
+│   │   │   ├── ui/               # Reusable Button, Card, Badge, Modal, Input components
+│   │   │   ├── village/          # Community channel sidebar, post feed, comments, reporting
+│   │   │   └── voice/            # Speech exercise cards, recorder modal, Web Audio visualizer
+│   │   ├── context/              # Authentication & User State Context Providers
+│   │   ├── hooks/                # TanStack Query custom hooks (useAuth, useJourney, etc.)
+│   │   ├── pages/                # Route pages (LoginPage, JourneyPage, VillagePage, etc.)
+│   │   ├── routes/               # Protected and public React Router configuration
+│   │   ├── types/                # TypeScript interface definitions matching backend schemas
+│   │   ├── App.tsx               # Main application layout wrapper
+│   │   └── main.tsx              # React DOM mounting entry point
+│   ├── Dockerfile                # Multi-stage Nginx Alpine production container
+│   ├── nginx.conf                # Production Nginx reverse proxy & SPA routing fallback
+│   ├── tailwind.config.ts        # Design tokens & color palette configuration
+│   └── vite.config.ts            # Vite build & Vitest test runner configuration
+│
+├── docs/                         # Technical Architecture & Engineering Specifications
+│   ├── AI_ARCHITECTURE.md        # Gemini 1.5 Flash RAG & safety routing design
+│   ├── API.md                    # REST API endpoint documentation & schemas
+│   ├── DATABASE.md               # PostgreSQL schema & pgvector vector search spec
+│   ├── DEPLOYMENT.md             # Production cloud deployment guide & checklists
+│   ├── DESIGN_SYSTEM.md          # Trauma-informed palette & typography tokens
+│   ├── PROJECT_ARCHITECTURE.md   # Longitudinal domain boundaries & data models
+│   ├── SECURITY.md               # HIPAA privacy, RBAC, and IDOR isolation policies
+│   └── TESTING.md                # Automated test matrix & quality standards
+│
+├── .env.example                  # Environment configuration template
+├── docker-compose.yml            # Local orchestration (PostgreSQL 16, pgvector, Redis, MinIO)
+├── AGENTS.md                     # AI Agent & Developer Operating Protocol
+├── LICENSE                       # MIT License with Medical Educational Disclaimer
+└── README.md                     # Project overview and documentation
+```
+
+---
+
+## 4. Platform Modules (Phases 3–11)
 
 | Module | Features & Capabilities |
 | :--- | :--- |
@@ -83,7 +152,7 @@ flowchart TD
 
 ---
 
-## 4. Technology Stack
+## 5. Technology Stack
 
 * **Frontend:** React 18, TypeScript 5, Vite, Tailwind CSS, TanStack Query v5, React Router v6, Lucide React, Recharts.
 * **Backend:** Python 3.11+, FastAPI (async), Pydantic v2, SQLAlchemy 2.0 (async), Loguru.
@@ -93,7 +162,7 @@ flowchart TD
 
 ---
 
-## 5. Quickstart Local Setup
+## 6. Quickstart Local Setup
 
 ### Option A: Using Docker Desktop (Recommended)
 
@@ -136,7 +205,7 @@ flowchart TD
 
 ---
 
-## 6. Testing Suite
+## 7. Testing Suite
 
 The repository maintains a 100% test pass rate across both backend and frontend test runners.
 
@@ -158,7 +227,7 @@ npm run build
 
 ---
 
-## 7. Medical Safety & Privacy Disclaimers
+## 8. Medical Safety & Privacy Disclaimers
 
 > [!IMPORTANT]
 > **Non-Diagnostic Notice:** CleftPath is an educational and supportive tool designed to assist families and individuals. It does **not** provide medical diagnoses, surgical determinations, or prescriptive treatment plans. Always consult an accredited multidisciplinary cleft team for medical decisions.
@@ -168,9 +237,6 @@ npm run build
 
 ---
 
-## 8. License
+## 9. License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
-### What is the MIT License?
-The MIT License is a permissive open-source license. It allows anyone to freely use, study, modify, merge, and distribute this software for personal or commercial purposes, while providing standard limitation of warranty and liability protections for the author.
