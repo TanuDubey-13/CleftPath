@@ -60,17 +60,17 @@ class Patient(Base, UUIDMixin, TimestampMixin):
     date_of_birth: Mapped[date] = mapped_column(Date, nullable=False)
     gender: Mapped[str] = mapped_column(String(20), nullable=False)
     cleft_lip: Mapped[CleftLipType] = mapped_column(
-        Enum(CleftLipType, name="cleft_lip_type", native_enum=True),
+        Enum(CleftLipType, name="cleft_lip_type", native_enum=True, values_callable=lambda obj: [e.value for e in obj]),
         default=CleftLipType.NONE,
         nullable=False,
     )
     cleft_palate: Mapped[CleftPalateType] = mapped_column(
-        Enum(CleftPalateType, name="cleft_palate_type", native_enum=True),
+        Enum(CleftPalateType, name="cleft_palate_type", native_enum=True, values_callable=lambda obj: [e.value for e in obj]),
         default=CleftPalateType.NONE,
         nullable=False,
     )
     cleft_alveolus: Mapped[CleftAlveolusType] = mapped_column(
-        Enum(CleftAlveolusType, name="cleft_alveolus_type", native_enum=True),
+        Enum(CleftAlveolusType, name="cleft_alveolus_type", native_enum=True, values_callable=lambda obj: [e.value for e in obj]),
         default=CleftAlveolusType.NONE,
         nullable=False,
     )

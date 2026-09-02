@@ -182,7 +182,8 @@ async def seed_database(session: AsyncSession) -> None:
 
     # 3. Seed Synthetic Demo Users
     # Password hash for synthetic testing: 'demo12345'
-    synthetic_hash = "$argon2id$v=19$m=65536,t=3,p=4$syntheticdemohashforseedonly$syntheticdemopasswordhash"
+    from app.core.security import get_password_hash
+    synthetic_hash = get_password_hash("demo12345")
 
     demo_parent = await session.execute(select(User).where(User.email == "demo.parent@example.com"))
     parent_user = demo_parent.scalar_one_or_none()
@@ -212,6 +213,8 @@ async def seed_database(session: AsyncSession) -> None:
                 ip_address="127.0.0.1",
             )
         )
+    else:
+        parent_user.hashed_password = synthetic_hash
 
     demo_clinician = await session.execute(select(User).where(User.email == "dr.demo@example.com"))
     clinician_user = demo_clinician.scalar_one_or_none()
@@ -227,6 +230,8 @@ async def seed_database(session: AsyncSession) -> None:
             is_verified=True,
         )
         session.add(clinician_user)
+    else:
+        clinician_user.hashed_password = synthetic_hash
 
     await session.flush()
     logger.info("Seeded Demo Users.")

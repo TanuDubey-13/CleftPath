@@ -21,7 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     # 1. Create Enums
     user_role_enum = postgresql.ENUM(
-        "caregiver", "patient_adult", "clinician", "moderator", "admin", name="user_role"
+        "caregiver", "patient_adult", "clinician", "moderator", "admin", name="user_role", create_type=False
     )
     user_role_enum.create(op.get_bind(), checkfirst=True)
 
@@ -35,6 +35,7 @@ def upgrade() -> None:
         "bilateral_complete",
         "microform",
         name="cleft_lip_type",
+        create_type=False,
     )
     cleft_lip_enum.create(op.get_bind(), checkfirst=True)
 
@@ -46,6 +47,7 @@ def upgrade() -> None:
         "submucous",
         "bifid_uvula",
         name="cleft_palate_type",
+        create_type=False,
     )
     cleft_palate_enum.create(op.get_bind(), checkfirst=True)
 
@@ -55,11 +57,12 @@ def upgrade() -> None:
         "involved_right",
         "involved_bilateral",
         name="cleft_alveolus_type",
+        create_type=False,
     )
     cleft_alveolus_enum.create(op.get_bind(), checkfirst=True)
 
     milestone_status_enum = postgresql.ENUM(
-        "upcoming", "in_progress", "completed", "skipped", name="milestone_status"
+        "upcoming", "in_progress", "completed", "skipped", name="milestone_status", create_type=False
     )
     milestone_status_enum.create(op.get_bind(), checkfirst=True)
 
@@ -73,6 +76,7 @@ def upgrade() -> None:
         "standard_bottle",
         "other",
         name="feeding_bottle_type",
+        create_type=False,
     )
     feeding_bottle_enum.create(op.get_bind(), checkfirst=True)
 

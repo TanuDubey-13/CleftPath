@@ -45,7 +45,7 @@ class FeedingLog(Base, UUIDMixin):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False, index=True
     )
     bottle_type: Mapped[FeedingBottleType] = mapped_column(
-        Enum(FeedingBottleType, name="feeding_bottle_type", native_enum=True),
+        Enum(FeedingBottleType, name="feeding_bottle_type", native_enum=True, values_callable=lambda obj: [e.value for e in obj]),
         nullable=False,
     )
     volume_ml: Mapped[Decimal] = mapped_column(Numeric(6, 2), nullable=False)

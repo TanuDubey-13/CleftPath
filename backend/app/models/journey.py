@@ -53,7 +53,7 @@ class JourneyMilestone(Base, UUIDMixin, TimestampMixin):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     target_age_months: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     status: Mapped[MilestoneStatus] = mapped_column(
-        Enum(MilestoneStatus, name="milestone_status", native_enum=True),
+        Enum(MilestoneStatus, name="milestone_status", native_enum=True, values_callable=lambda obj: [e.value for e in obj]),
         default=MilestoneStatus.UPCOMING,
         nullable=False,
     )
