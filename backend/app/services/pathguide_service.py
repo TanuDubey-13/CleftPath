@@ -459,7 +459,7 @@ class PathGuideService:
         )
 
         # 5. Persist Assistant Message
-        citations_json = [c.model_dump() for c in citations]
+        citations_json = [c.model_dump(mode="json") for c in citations]
         assistant_message = PathGuideMessage(
             id=uuid.uuid4(),
             thread_id=thread.id,
